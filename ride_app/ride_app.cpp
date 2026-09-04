@@ -45,7 +45,7 @@ class User{
     
     User(string id, string name, string phone){
         user_id = id;
-        name = name;
+        this->name = name;
         phone_number = phone;
     }
 
