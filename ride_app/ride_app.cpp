@@ -6,6 +6,23 @@
 
 using namespace std;
 
+
+// User
+//  ├── Rider
+//  └── Driver
+//        └── Vehicle
+
+// Location
+
+// Ride
+//  ├── Rider
+//  ├── Driver
+//  └── Location
+
+// Payment
+
+// RideMatchingService
+
 class Location{
     double latitude;
     double longitude;
@@ -24,12 +41,27 @@ public:
     }
 };
 
-class Vehicle{
+class Payment{
+    public:
+    double calculateFare(Location& pickup, Location& dropoff) {
+        double distance = pickup.distanceTo(dropoff);
+        return 50 + distance * 10;
+    }
+
+    void pay(double amount) {
+        cout << "Payment successful. Amount: $" << amount << endl;
+    }
+};
+
+
+class Vehicle {
+private:
     string vehicle_id;
     string model;
     string license_plate;
 
-    Vehicle(string id, string mod, string plate){
+public:
+    Vehicle(string id, string mod, string plate) {
         vehicle_id = id;
         model = mod;
         license_plate = plate;
@@ -71,10 +103,22 @@ class Driver: public User{
     private:
     Location location;
     bool available;
+    Vehicle vehicle;
 
     public:
-    Driver(string name, Location loc, string phone): User(name, name, phone), location(loc), available(true) {}
+        Driver(
+            string id,
+            string name,
+            string phone,
+            Location loc,
+            Vehicle vehicle
+        )
+            : User(id, name, phone),
+            location(loc),
+            vehicle(vehicle),
+            available(true) {}
 
+            
     bool isAvailable() const {
         return available;
     }
@@ -110,12 +154,16 @@ class Ride{
     void end(){
         if(!started) return;
 
-        double distance = pickup_location.distanceTo(dropoff_location);
-        double fare = 50 + distance * 10; // base fare + distance fare
-        cout<<"Ride ended for rider: " << rider.getName() << " with driver: " << driver.getName() << ". Total fare: $" << fare << endl;
+        Payment payment;
+        double fare = payment.calculateFare(pickup_location, dropoff_location);
+
+        cout << "Ride ended for rider: "<< rider.getName() << endl;
+
+        payment.pay(fare);
         driver.setAvailability(true);
     }   
 };
+
 
 Driver* findNearestDriver(vector<Driver*>&drivers,Location&pickup_location){
     Driver* nearest_driver = nullptr;
@@ -136,8 +184,21 @@ Driver* findNearestDriver(vector<Driver*>&drivers,Location&pickup_location){
 int main() {
     cout<< "Hello, World!" << endl;
 
-    Driver driver1("John", Location(37.7749, -122.4194), "1234567890");
-    Driver driver2("Alice",Location(37.8044, -122.2711), "0987654321");
+Driver driver1(
+    "d1",
+    "John",
+    "1234567890",
+    Location(37.7749, -122.4194),
+    Vehicle("v1", "Honda City", "ABC123")
+); 
+
+Driver driver2(
+    "d2",
+    "Alice",
+    "0987654321",
+    Location(37.8044, -122.2711),
+    Vehicle("v2", "Toyota Camry", "XYZ789")
+);
 
     Rider rider1("1","Ashish","1234567890");
 
